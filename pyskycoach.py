@@ -8,7 +8,7 @@
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details, in file gpl.txt
+# GNU General Public License for more details, in file LICENSE
 
 from Tkinter import *
 import tkMessageBox 
@@ -241,7 +241,7 @@ def helptxt():
   t.pack(side=LEFT, fill=Y)
   s.config(command=t.yview)
   t.config(yscrollcommand=s.set)
-  hf = open("readme.txt", "r")
+  hf = open("README.md", "r")
   for l in hf: t.insert(END, l)
 
 def main():

@@ -14,7 +14,7 @@ To run the program you need the Python environment, which you
 can download from www.python.org if necessary. Depending on your
 operating system you may have to install the package python-tk
 as well.
-Once Python is installed you can usually start the program by 
+With Python installed you can usually start the program by 
 double clicking on the file pyskycoach.py in your file manager, 
 or by typing "python pyskycoach.py" on the command line.
 
