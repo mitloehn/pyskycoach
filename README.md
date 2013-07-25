@@ -8,9 +8,12 @@ from a moderately dark site.
 
 INSTALLATION:
 
-The archive files can be extracted to any directory of your choice.
+Download the ZIP archive and extract to a directory of your 
+choice. Alternatively, you can use git to obtain the files.
 To run the program you need the Python environment, which you 
-can download from www.python.org if necessary. 
+can download from www.python.org if necessary. Depending on your
+operating system you may have to install the package python-tk
+as well.
 Once Python is installed you can usually start the program by 
 double clicking on the file pyskycoach.py in your file manager, 
 or by typing "python pyskycoach.py" on the command line.
