@@ -34,11 +34,11 @@ distortion towards the celestial poles.
 
 CONFIGURATION:
 
-Use the File menu to change the set of DSO:
+Use the File menu to change the set of DSO: 
 
-easymes.csv - easy Messier objects
-messier.csv - complete Messier list
-urban.csv   - DSO list for urban observers
+- easymes.csv: easy Messier objects
+- messier.csv: complete Messier list
+- urban.csv:   DSO list for urban observers 
 
 Use your favorite text editor to take a look at the CSV files 
 if you want to modify them. The format is very simple: name,
