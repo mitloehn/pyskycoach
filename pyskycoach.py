@@ -11,67 +11,41 @@
 # GNU General Public License for more details, in file LICENSE
 
 from Tkinter import *
-# import tkMessageBox 
 import random
 
-# add your own here!
+# add your own CSV files here!
 FILES = ("easymes.csv", "messier.csv", "urban.csv")
 
-root = Tk()
-root.title("PySkyCoach 0.1")
-stars = {}
-dso = {}
-nm = {}
-dsofiles = {}
-cur = ""
-cnt = 0
-score = 0.0
-for f in FILES:
-  (pre,post) = f.split(".")
-  dsofiles[pre] = IntVar()
-
 def clicked(event):
-  global cur, mp, score, cnt, done, curi, clicks, lcur
+  global cur, mp, score, cnt, done, curi, lcur
   if done: return 0
-  clicks += [[event.x, event.y]]
   (na, r, d) = dso[cur[curi]]
   drawob(na, r, d)
   (x, y) = (r2x(r), d2y(d))
   mp.create_line(x, y, event.x, event.y, fill="red")
   score += abs(x-event.x)/float(mp.winfo_width()) + abs(y-event.y)/float(mp.winfo_height()) 
   curi += 1
-  if curi >= 5: 
+  if curi >= len(cur): 
     done = True
-    # drawclicks()
     getscore()
   else:
-    lcur.config(text=cur[curi])
+    lcur.config(text="Find: " + cur[curi])
 
 def getscore():
   global score, curi, clicks, lcur
   if score < 0.1: msg = "Excellent!"
-  elif score < 0.5: msg = "OK"
-  elif score < 1.0: msg = "Room for improvement"
+  elif score < 0.5: msg = "Good."
+  elif score < 1.0: msg = "Not too bad."
+  elif score < 2.0: msg = "Quite bad."
   else: msg = "Dreadful!"
-  # tkMessageBox.showinfo("End of Round", "Score: " + ("%.1f" % score) + "  " + msg)
-  lcur.config(text="Score: " + ("%.1f" % score) + "  " + msg)
-
-def drawclicks():
-  global cur, clicks, mp
-  drawstars()
-  for i in range(len(clicks)):
-    (na, r, d) = dso[cur[i]]
-    (x, y) = clicks[i]
-    drawob(na, r, d)
-    mp.create_line(x, y, r2x(r), d2y(d), fill="red")
-  clicks = []
+  lcur.config(text=" *** Score: " + ("%.1f" % score) + "  " + msg + " ***  ")
 
 def drawob(na, r, d):
   global mp
   x = r2x(r)
   y = d2y(d)
   dia=8
-  mp.create_oval(x-dia/2, y-dia/2, x+dia/2, y+dia/2, outline="red")
+  mp.create_oval(x-dia/2, y-dia/2, x+dia/2, y+dia/2, outline="white")
   mp.create_text(x+10, y+1, anchor=W, text=na, font=("Helvetica", 8), fill="white")
 
 def resize(event):
@@ -87,17 +61,15 @@ def drawstars():
   cnt = 0
   for s in stars.keys():
     (r,d,m) = stars[s]
-    # if r < r1 or r > r2 or d < d1 or d > d2: continue
     if (not inr(r)) or d < d1 or d > d2: continue
-    x = r2x(r) # (1 - float(r - r1)/(r2 - r1)) * w
-    y = d2y(d) # (1 - float(d - d1)/(d2 - d1)) * h
+    x = r2x(r) 
+    y = d2y(d) 
     # dia = int((7.5-m)*1.0)
     if m > 4.5: dia = 2
     elif m > 3.8: dia = 2
     elif m > 2.5: dia = 3
     elif m > 1.5: dia = 4
     else: dia = 6
-    # mp.create_oval(x-dia/2, y-dia/2, x+dia/2, y+dia/2, fill="white")
     mp.create_oval(x, y, x+dia, y+dia, fill="white")
     # mp.create_text(x+10, y+1, text=str(m), anchor=W, font=("Helvetica", 8), fill="white")
     cnt += 1
@@ -185,22 +157,24 @@ def deminus():
   drawstars()
 
 def bnew():
-  global cur, lcur, done, curi, clicks
+  global cur, lcur, done, curi, score
   cur = newdso()
-  lcur.config(text=cur[0])
+  lcur.config(text="Find: " + cur[0])
   curi = 0
-  score = 0
+  score = 0.0
   drawstars()
   done = False
-  clicks = []
+
+def min(x, y):
+  if x < y: return x
+  else: return y
 
 def newdso():
   lst = {}
   for o in dso.keys():
     (na, r, d) = dso[o]
-    # if (r >= r1 and r <= r2 and d >= d1 and d <= d2): lst[na] = 1
     if (inr(r) and d >= d1 and d <= d2): lst[na] = 1
-  return random.sample(lst.keys(), 5)
+  return random.sample(lst.keys(), min(len(lst), 5))
 
 def reloaddso():
   global dso
@@ -217,7 +191,6 @@ def zoomout():
   if rdif(r2, r1) >= 10: return 0
   r1 = (r1 - 1) % 24
   r2 = (r2 + 1) % 24
-  # if d1 <= -90 or d2 >= 90: return 0
   d1 -= 10
   d2 += 10
   drawstars()
@@ -248,23 +221,42 @@ def changeview(deg):
   drawstars()
 
 def helptxt():
+  showfile("README.md", "PySkyCoach Readme")
+
+def license():
+  showfile("LICENSE", "License")
+
+def about():
+  showfile("about.txt", "About")
+
+def showfile(fn, tit):
   h = Tk()
-  h.title("PySkyCoach Readme")
+  h.title(tit)
   s = Scrollbar(h)
-  t = Text(h, height=40, width=70)
+  t = Text(h, height=40, width=79)
   s.pack(side=RIGHT, fill=Y)
   t.pack(side=LEFT, fill=Y)
   s.config(command=t.yview)
   t.config(yscrollcommand=s.set)
-  hf = open("README.md", "r")
-  for l in hf: t.insert(END, l)
+  hf = open(fn, "r")
+  t.insert(END, "\n")
+  for l in hf: t.insert(END, " "+l)
 
 def main():
   global mp, r1, r2, d1, d2, lcur, cur, lra, lde, viewvar, done
+  global stars, dso, dsofiles, FILES, nm
+  root = Tk()
+  root.title("PySkyCoach 0.1")
+  stars = {}
+  dso = {}
+  nm = {}
+  dsofiles = {}
+  for f in FILES:
+    (pre,post) = f.split(".")
+    dsofiles[pre] = IntVar()
   readstars()
   readnm()
   dsofiles["easymes"].set(1)
-  # traceName = urban.trace_variable("w", callback)
   reloaddso()
   done = False
   r1, r2, d1, d2 = (15, 21, -50, 50)
@@ -284,24 +276,24 @@ def main():
   # Button(root, text="Zoom in", command=zoomin).pack(side=LEFT)
   mb = Menu(root)
   fm = Menu(mb, tearoff=0)
-  fm.add_command(label="Help", command=helptxt)
   fm.add_command(label="Quit", command=root.quit)
   dm = Menu(mb, tearoff=0)
   for k in dsofiles.keys():
     traceName = dsofiles[k].trace_variable("w", callback)
-    # dm.add_checkbutton(label=k, onvalue=1, offvalue=0, variable=dsofiles[k])
     dm.add_checkbutton(label=k, onvalue=1, offvalue=0, variable=dsofiles[k])
   vm = Menu(mb, tearoff=0)
   vm.add_command(label="50 deg", command=lambda: changeview(50))
   vm.add_command(label="100 deg", command=lambda: changeview(100))
   vm.add_command(label="360 deg", command=lambda: changeview(360))
+  hm = Menu(mb, tearoff=0)
+  hm.add_command(label="Instructions", command=helptxt)
+  hm.add_command(label="License", command=license)
+  hm.add_command(label="About", command=about)
   mb.add_cascade(label="File", menu=fm)
   mb.add_cascade(label="DSO", menu=dm)
   mb.add_cascade(label="View", menu=vm)
+  mb.add_cascade(label="Help", menu=hm)
   root.config(menu=mb)
-  # for k in dsofiles.keys():
-  #   Checkbutton(root, text=k, var=dsofiles[k]).pack(side=LEFT)
-  # Button(root, text="Reload", command=reloaddso).pack(side=LEFT)
   cur = newdso()
   Button(root, text="Start Over", command=bnew).pack(side=RIGHT)
   lcur = Label(root, text="...")
