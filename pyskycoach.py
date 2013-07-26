@@ -11,7 +11,7 @@
 # GNU General Public License for more details, in file LICENSE
 
 from Tkinter import *
-import tkMessageBox 
+# import tkMessageBox 
 import random
 
 # add your own here!
@@ -31,28 +31,40 @@ for f in FILES:
   dsofiles[pre] = IntVar()
 
 def clicked(event):
-  global cur, mp, score, cnt, done
+  global cur, mp, score, cnt, done, curi, clicks, lcur
   if done: return 0
-  (na, r, d) = dso[cur]
+  clicks += [[event.x, event.y]]
+  (na, r, d) = dso[cur[curi]]
   drawob(na, r, d)
   (x, y) = (r2x(r), d2y(d))
   mp.create_line(x, y, event.x, event.y, fill="red")
   score += abs(x-event.x)/float(mp.winfo_width()) + abs(y-event.y)/float(mp.winfo_height()) 
-  cnt += 1
-  done = True
-  if cnt >= 5: newround()
+  curi += 1
+  if curi >= 5: 
+    done = True
+    # drawclicks()
+    getscore()
+  else:
+    lcur.config(text=cur[curi])
 
-def newround():
-  global score, cnt
+def getscore():
+  global score, curi, clicks, lcur
   if score < 0.1: msg = "Excellent!"
   elif score < 0.5: msg = "OK"
   elif score < 1.0: msg = "Room for improvement"
   else: msg = "Dreadful!"
-  drawdso()
-  tkMessageBox.showinfo("End of Round", "Score: " + ("%.1f" % score) + "  " + msg)
-  cnt = 0
-  score = 0
-  bnew()
+  # tkMessageBox.showinfo("End of Round", "Score: " + ("%.1f" % score) + "  " + msg)
+  lcur.config(text="Score: " + ("%.1f" % score) + "  " + msg)
+
+def drawclicks():
+  global cur, clicks, mp
+  drawstars()
+  for i in range(len(clicks)):
+    (na, r, d) = dso[cur[i]]
+    (x, y) = clicks[i]
+    drawob(na, r, d)
+    mp.create_line(x, y, r2x(r), d2y(d), fill="red")
+  clicks = []
 
 def drawob(na, r, d):
   global mp
@@ -173,11 +185,14 @@ def deminus():
   drawstars()
 
 def bnew():
-  global cur, lcur, done
+  global cur, lcur, done, curi, clicks
   cur = newdso()
-  lcur.config(text=cur)
+  lcur.config(text=cur[0])
+  curi = 0
+  score = 0
   drawstars()
   done = False
+  clicks = []
 
 def newdso():
   lst = {}
@@ -185,7 +200,7 @@ def newdso():
     (na, r, d) = dso[o]
     # if (r >= r1 and r <= r2 and d >= d1 and d <= d2): lst[na] = 1
     if (inr(r) and d >= d1 and d <= d2): lst[na] = 1
-  return random.choice(lst.keys())
+  return random.sample(lst.keys(), 5)
 
 def reloaddso():
   global dso
@@ -265,8 +280,8 @@ def main():
   Button(root, text="RA-", command=raminus).pack(side=LEFT)
   Button(root, text="DE+", command=deplus).pack(side=LEFT)
   Button(root, text="DE-", command=deminus).pack(side=LEFT)
-  Button(root, text="Zoom out", command=zoomout).pack(side=LEFT)
-  Button(root, text="Zoom in", command=zoomin).pack(side=LEFT)
+  # Button(root, text="Zoom out", command=zoomout).pack(side=LEFT)
+  # Button(root, text="Zoom in", command=zoomin).pack(side=LEFT)
   mb = Menu(root)
   fm = Menu(mb, tearoff=0)
   fm.add_command(label="Help", command=helptxt)
@@ -288,8 +303,9 @@ def main():
   #   Checkbutton(root, text=k, var=dsofiles[k]).pack(side=LEFT)
   # Button(root, text="Reload", command=reloaddso).pack(side=LEFT)
   cur = newdso()
-  Button(root, text="New", command=bnew).pack(side=RIGHT)
-  lcur = Label(root, text=cur)
+  Button(root, text="Start Over", command=bnew).pack(side=RIGHT)
+  lcur = Label(root, text="...")
+  bnew()
   lcur.pack(side=RIGHT)
   root.mainloop()
 
