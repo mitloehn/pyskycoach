@@ -147,12 +147,14 @@ def raminus():
 
 def deplus():
   global d1, d2
+  if d2 >= 90: return 0
   d1 += 5
   d2 += 5
   drawstars()
 
 def deminus():
   global d1, d2
+  if d1 <= -90: return 0
   d1 -= 5
   d2 -= 5
   drawstars()
@@ -213,10 +215,10 @@ def changeview(deg):
     d2 = d1 + 25
   elif deg == 50:
     r2 = (r1 + 4) % 24
-    d2 = d1 + 50
+    (d1, d2) = (0, 50)
   elif deg == 100:
-    r2 = (r1 + 6) % 24
-    d2 = d1 + 100
+    r2 = (r1 + 8) % 24
+    (d1, d2) = (-50, 50)
   elif deg == 360:
     r1 = 0
     r2 = 24
@@ -263,21 +265,22 @@ def main():
   dsofiles["easymes"].set(1)
   reloaddso()
   done = False
-  r1, r2, d1, d2 = (15, 21, -50, 50)
-  mp = Canvas(root, width=800, height=800, bg="black")
+  r1, r2, d1, d2 = (14, 22, -50, 50)
+  mp = Canvas(root, width=800, height=600, bg="black")
   mp.bind("<Button-1>", clicked)
   mp.bind("<Configure>", resize)
   mp.pack(fill=BOTH, expand=YES)
-  lra = Label(root)
+  pan = Frame(root)
+  lra = Label(pan)
   lra.pack(side=LEFT)
-  lde = Label(root)
+  lde = Label(pan)
   lde.pack(side=LEFT)
-  Button(root, text="RA+", command=raplus).pack(side=LEFT)
-  Button(root, text="RA-", command=raminus).pack(side=LEFT)
-  Button(root, text="DE+", command=deplus).pack(side=LEFT)
-  Button(root, text="DE-", command=deminus).pack(side=LEFT)
-  # Button(root, text="Zoom out", command=zoomout).pack(side=LEFT)
-  # Button(root, text="Zoom in", command=zoomin).pack(side=LEFT)
+  Button(pan, text="RA+", command=raplus).pack(side=LEFT)
+  Button(pan, text="RA-", command=raminus).pack(side=LEFT)
+  Button(pan, text="DE+", command=deplus).pack(side=LEFT)
+  Button(pan, text="DE-", command=deminus).pack(side=LEFT)
+  # Button(pan, text="Zoom out", command=zoomout).pack(side=LEFT)
+  # Button(pan, text="Zoom in", command=zoomin).pack(side=LEFT)
   mb = Menu(root)
   fm = Menu(mb, tearoff=0)
   fm.add_command(label="Quit", command=root.quit)
@@ -300,10 +303,11 @@ def main():
   mb.add_cascade(label="Help", menu=hm)
   root.config(menu=mb)
   cur = newdso()
-  Button(root, text="Start Over", command=bnew).pack(side=RIGHT)
-  lcur = Label(root, text="...")
+  Button(pan, text="Start Over", command=bnew).pack(side=RIGHT)
+  lcur = Label(pan, text="..")
   bnew()
   lcur.pack(side=RIGHT)
+  pan.pack(fill=BOTH, expand=YES)
   root.mainloop()
 
 if __name__ == '__main__': main()
