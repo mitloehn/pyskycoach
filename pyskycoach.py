@@ -14,7 +14,7 @@ from Tkinter import *
 import random
 
 # add your own CSV files here!
-FILES = ("easymes.csv", "messier.csv", "urban.csv")
+FILES = ("easymes.csv", "messier.csv", "urban.csv", "rascngc.csv")
 
 def clicked(event):
   global cur, mp, score, cnt, done, curi, lcur
@@ -67,13 +67,13 @@ def drawstars():
     # dia = int((7.5-m)*1.0)
     if m > 4.5: dia = 2
     elif m > 3.8: dia = 2
-    elif m > 2.5: dia = 3
+    elif m > 2.8: dia = 3
     elif m > 1.5: dia = 4
     else: dia = 6
     mp.create_oval(x, y, x+dia, y+dia, fill="white")
     # mp.create_text(x+10, y+1, text=str(m), anchor=W, font=("Helvetica", 8), fill="white")
     cnt += 1
-  print "drawn", cnt, "stars"
+  # print "drawn", cnt, "stars"
   mp.pack()
 
 def drawdso():
@@ -104,6 +104,7 @@ def inr(r):
 def readstars():
   f = open("bscmag5.csv", "r")
   for line in f:
+    if line.startswith("#"): continue
     (hr,na,ra,de,mg) = line.split(",")
     (r,d) = rade(ra,de)
     stars[hr] = (r,d,float(mg))
@@ -180,7 +181,7 @@ def reloaddso():
   global dso
   dso = {}
   for k in dsofiles.keys():
-    print k, dsofiles[k].get()
+    # print k, dsofiles[k].get()
     if dsofiles[k].get() == 1: readdso(k + ".csv")
 
 def callback(name, index, mode):
@@ -206,8 +207,11 @@ def zoomin():
 
 def changeview(deg):
   global r1, r2, d1, d2
-  print "changeview", deg, deg == 360
-  if deg == 50:
+  # print "changeview", deg, deg == 360
+  if deg == 25:
+    r2 = (r1 + 2) % 24
+    d2 = d1 + 25
+  elif deg == 50:
     r2 = (r1 + 4) % 24
     d2 = d1 + 50
   elif deg == 100:
@@ -282,6 +286,7 @@ def main():
     traceName = dsofiles[k].trace_variable("w", callback)
     dm.add_checkbutton(label=k, onvalue=1, offvalue=0, variable=dsofiles[k])
   vm = Menu(mb, tearoff=0)
+  vm.add_command(label="25 deg", command=lambda: changeview(25))
   vm.add_command(label="50 deg", command=lambda: changeview(50))
   vm.add_command(label="100 deg", command=lambda: changeview(100))
   vm.add_command(label="360 deg", command=lambda: changeview(360))
