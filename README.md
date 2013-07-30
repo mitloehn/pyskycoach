@@ -2,7 +2,7 @@ Welcome to the PySkyCoach!
 
 This application shows a view of the sky with the objective of 
 locating deep space objects, as you would with a non-magnifying 
-finder. All 1630 stars up to visual magnitude 5 are plotted, 
+finder. Stars up to visual magnitude 5 are plotted, 
 roughly corresponding to what you can see with the naked eye 
 from a moderately dark site.
 
@@ -24,7 +24,7 @@ USAGE:
 
 Your task is to click on the location of the DSO named in the 
 bottom bar. The correct location will be shown, with a line 
-displaying the difference from your own estimate. The program
+displaying the difference from your estimate. The program
 will present a maximum of 5 challenges per round, depending on
 the region of sky and the set of DSO selected. At the end of
 the round a score will be shown. The score is simply the
@@ -36,9 +36,8 @@ the view of the sky before starting a new round.
 Right ascension and declination are simply drawn on 
 rectangular x/y coordinates within the window. This works 
 reasonably well up to about 70 degrees but results in severe 
-distortion towards the poles.
-Depending on the view a change in window size and 
-shape can result in more accurate display of the sky map.
+distortion towards the celestial poles. Depending on the view 
+a change in window shape will result in less distortion.
 
 
 CONFIGURATION:
@@ -47,7 +46,8 @@ Use the File menu to change the set of DSO:
 
 - easymes.csv: easy Messier objects
 - messier.csv: complete Messier list
-- urban.csv:   DSO list for urban observers 
+- urban.csv:   AAAA urban club list 
+- rascngc.csv: RASC's Finest N.G.C.
 
 The file format is name, right ascension, declination, all 
 separated by comas. You can put your own files in the
@@ -79,6 +79,9 @@ from http://messier.seds.org
 
 The AAAA Urban Astronomy Club List of Objects
 compiled by John Wagoner (stargate at gte.net)
+
+The Royal Astronomical Society of Canada Finest N.G.C. Objects List 
+compiled by Alan Dyer
 
 BSC5P - Bright Star Catalog, available at
 http://heasarc.gsfc.nasa.gov/W3Browse/star-catalog/bsc5p.html
