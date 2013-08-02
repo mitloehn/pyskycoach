@@ -12,6 +12,7 @@
 
 from Tkinter import *
 import random
+from math import sin, cos, pi
 
 # add your own CSV files here!
 FILES = ("easymes.csv", "messier.csv", "urban.csv", "rascngc.csv")
@@ -52,7 +53,7 @@ def resize(event):
   drawstars()
 
 def drawstars():
-  global w, h, lra, lde, r1, r2
+  global w, h, lra, lde, r1, r2, d1, d2
   mp.delete("all")
   lra.config(text="RA "+str(r1)+" to "+str(r2))
   lde.config(text="DE "+str(d1)+" to "+str(d2))
@@ -64,6 +65,15 @@ def drawstars():
     if (not inr(r)) or d < d1 or d > d2: continue
     x = r2x(r) 
     y = d2y(d) 
+    # ra0 = 18.0 # rdif(r2, r1) / 2.0
+    # dec0 = 0.0 # (d2 - d1) / 2.0
+    # delta_ra = ((r - ra0)/6) * (pi/2)
+    # dec = (d/90) * (pi/2)
+    # x1 = cos( dec) * sin( delta_ra)
+    # y1 = sin( dec) * cos( dec0) - cos( dec) * cos( delta_ra) * sin( dec0);
+    # x = w - w * (1 + x1) * 0.5
+    # y = h - h * (1 + y1) * 0.5
+    # print ("%.1f %.1f  %.1f %.1f" % (r, d, x, y))
     # dia = int((7.5-m)*1.0)
     if m > 4.5: dia = 2
     elif m > 3.8: dia = 2
