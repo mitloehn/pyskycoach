@@ -18,7 +18,7 @@ from math import sin, cos, pi
 FILES = ("easymes.csv", "messier.csv", "urban.csv", "rascngc.csv")
 
 def clicked(event):
-  global cur, mp, score, cnt, done, curi, lcur
+  global cur, mp, score, cnt, done, curi, lcur, fg
   if done: return 0
   (na, r, d) = dso[cur[curi]]
   drawob(na, r, d)
@@ -42,24 +42,23 @@ def getscore():
   lcur.config(text=" *** Score: " + ("%.1f" % score) + "  " + msg + " ***  ")
 
 def drawob(na, r, d):
-  global mp
+  global mp, fg
   x = r2x(r)
   y = d2y(d)
   dia=8
-  mp.create_oval(x-dia/2, y-dia/2, x+dia/2, y+dia/2, outline="white")
-  mp.create_text(x+10, y+1, anchor=W, text=na, font=("Helvetica", 8), fill="white")
+  mp.create_oval(x-dia/2, y-dia/2, x+dia/2, y+dia/2, outline=fg)
+  mp.create_text(x+10, y+1, anchor=W, text=na, font=("Helvetica", 8), fill=fg)
 
 def resize(event):
   drawstars()
 
 def drawstars():
-  global w, h, lra, lde, r1, r2, d1, d2
+  global w, h, lra, lde, r1, r2, d1, d2, sa, mp, fg
   mp.delete("all")
   lra.config(text="RA "+str(r1)+" to "+str(r2))
   lde.config(text="DE "+str(d1)+" to "+str(d2))
   w = mp.winfo_width()
   h = mp.winfo_height()
-  cnt = 0
   for s in stars.keys():
     (r,d,m) = stars[s]
     if (not inr(r)) or d < d1 or d > d2: continue
@@ -75,25 +74,32 @@ def drawstars():
     # y = h - h * (1 + y1) * 0.5
     # print ("%.1f %.1f  %.1f %.1f" % (r, d, x, y))
     # dia = int((7.5-m)*1.0)
-    if m > 4.5: dia = 2
-    elif m > 3.8: dia = 2
-    elif m > 2.8: dia = 3
-    elif m > 1.5: dia = 4
-    else: dia = 6
-    mp.create_oval(x, y, x+dia, y+dia, fill="white")
+    if fg == "black":
+      if m > 4.5: dia = 2
+      elif m > 3.8: dia = 3
+      elif m > 2.8: dia = 4
+      elif m > 1.5: dia = 6
+      else: dia = 8
+    else:
+      if m > 4.5: dia = 2
+      elif m > 3.8: dia = 2
+      elif m > 2.8: dia = 3
+      elif m > 1.5: dia = 4
+      else: dia = 7
+    mp.create_oval(x, y, x+dia, y+dia, fill=fg, outline=oppcol(fg))
     # mp.create_text(x+10, y+1, text=str(m), anchor=W, font=("Helvetica", 8), fill="white")
-    cnt += 1
-  # print "drawn", cnt, "stars"
+  if sa.get() == 1: drawdso()
   mp.pack()
 
 def drawdso():
+  global fg
   for k in dso.keys():
     (na, r, d) = dso[k]
     x = r2x(r)
     y = d2y(d)
     dia=6
-    mp.create_oval(x-dia/2, y-dia/2, x+dia/2, y+dia/2, outline="green")
-    mp.create_text(x+10, y+1, anchor=W, text=na, font=("Helvetica", 8), fill="green")
+    mp.create_oval(x-dia/2, y-dia/2, x+dia/2, y+dia/2, outline=fg)
+    mp.create_text(x+10, y+1, anchor=W, text=na, font=("Helvetica", 7), fill=fg)
 
 def r2x(r):
   return (1 - float(rdif(r, r1))/(rdif(r2, r1))) * w
@@ -121,6 +127,7 @@ def readstars():
   f.close()
 
 def readdso(fn):
+  global dso
   f = open(fn, "r")
   for line in f:
     (na, r, d) = line.split(",")
@@ -128,6 +135,7 @@ def readdso(fn):
     if nm.has_key(na): na = nm[na]
     if na.startswith("NGC "): na = na[4:]
     dso[na] = (na, ra, de)
+  f.close()
 
 def readnm():
   f = open("nm.csv", "r")
@@ -198,6 +206,7 @@ def reloaddso():
 
 def callback(name, index, mode):
   reloaddso()
+  drawstars()
 
 def zoomout():
   global r1, r2, d1, d2
@@ -258,9 +267,20 @@ def showfile(fn, tit):
   t.insert(END, "\n")
   for l in hf: t.insert(END, " "+l)
 
+def oppcol(col):
+  if col == "white": return "black"
+  if col == "black": return "white"
+
+def setfg(col):
+  global mp, fg
+  mp.delete("all")
+  fg = col
+  mp.config(bg=oppcol(fg))
+  drawstars()
+
 def main():
   global mp, r1, r2, d1, d2, lcur, cur, lra, lde, viewvar, done
-  global stars, dso, dsofiles, FILES, nm
+  global stars, dso, dsofiles, FILES, nm, sa, fg
   root = Tk()
   root.title("PySkyCoach 0.1")
   stars = {}
@@ -270,6 +290,8 @@ def main():
   for f in FILES:
     (pre,post) = f.split(".")
     dsofiles[pre] = IntVar()
+  sa = IntVar()
+  fg = "white"
   readstars()
   readnm()
   dsofiles["easymes"].set(1)
@@ -297,11 +319,15 @@ def main():
   for k in dsofiles.keys():
     traceName = dsofiles[k].trace_variable("w", callback)
     dm.add_checkbutton(label=k, onvalue=1, offvalue=0, variable=dsofiles[k])
+  sa.trace_variable("w", callback)
+  dm.add_checkbutton(label="Show All", onvalue=1, offvalue=0, variable=sa)
   vm = Menu(mb, tearoff=0)
   vm.add_command(label="25 deg", command=lambda: changeview(25))
   vm.add_command(label="50 deg", command=lambda: changeview(50))
   vm.add_command(label="100 deg", command=lambda: changeview(100))
   vm.add_command(label="360 deg", command=lambda: changeview(360))
+  vm.add_command(label="White on Black", command=lambda: setfg("white"))
+  vm.add_command(label="Black on White",command=lambda: setfg("black"))
   hm = Menu(mb, tearoff=0)
   hm.add_command(label="Instructions", command=helptxt)
   hm.add_command(label="License", command=license)
