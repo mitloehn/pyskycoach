@@ -138,9 +138,10 @@ def readdso(fn):
   f.close()
 
 def readnm():
+  global nm
   f = open("nm.csv", "r")
   for line in f:
-    (n, m) = line.split(",")
+    (n, m) = line.strip().split(",")
     nm[n] = m
   f.close()
 
