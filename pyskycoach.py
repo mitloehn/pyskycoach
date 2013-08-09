@@ -22,7 +22,7 @@ def clicked(event):
   if done: return 0
   (na, r, d) = dso[cur[curi]]
   drawob(na, r, d)
-  (x, y) = (r2x(r), d2y(d))
+  (x, y) = rd2xy(r, d)
   mp.create_line(x, y, event.x, event.y, fill="red")
   score += abs(x-event.x)/float(mp.winfo_width()) + abs(y-event.y)/float(mp.winfo_height()) 
   curi += 1
@@ -43,8 +43,7 @@ def getscore():
 
 def drawob(na, r, d):
   global mp, fg
-  x = r2x(r)
-  y = d2y(d)
+  (x, y) = rd2xy(r, d)
   dia=8
   mp.create_oval(x-dia/2, y-dia/2, x+dia/2, y+dia/2, outline=fg)
   mp.create_text(x+10, y+1, anchor=W, text=na, font=("Helvetica", 8), fill=fg)
@@ -53,7 +52,7 @@ def resize(event):
   drawstars()
 
 def drawstars():
-  global w, h, lra, lde, r1, r2, d1, d2, sa, mp, fg
+  global w, h, lra, lde, r1, r2, d1, d2, sa, mp, fg, pv
   mp.delete("all")
   lra.config(text="RA "+str(r1)+" to "+str(r2))
   lde.config(text="DE "+str(d1)+" to "+str(d2))
@@ -61,18 +60,13 @@ def drawstars():
   h = mp.winfo_height()
   for s in stars.keys():
     (r,d,m) = stars[s]
+    # if pv:
+    #   if d < 50: continue
+    #   (x, y) = rd2xy(r, d)
+    #   print ("%.1f %.1f --> %.1f %.1f" % (r, d, x, y))
+    # else:
     if (not inr(r)) or d < d1 or d > d2: continue
-    x = r2x(r) 
-    y = d2y(d) 
-    # ra0 = 18.0 # rdif(r2, r1) / 2.0
-    # dec0 = 0.0 # (d2 - d1) / 2.0
-    # delta_ra = ((r - ra0)/6) * (pi/2)
-    # dec = (d/90) * (pi/2)
-    # x1 = cos( dec) * sin( delta_ra)
-    # y1 = sin( dec) * cos( dec0) - cos( dec) * cos( delta_ra) * sin( dec0);
-    # x = w - w * (1 + x1) * 0.5
-    # y = h - h * (1 + y1) * 0.5
-    # print ("%.1f %.1f  %.1f %.1f" % (r, d, x, y))
+    (x, y) = rd2xy(r, d)
     # dia = int((7.5-m)*1.0)
     if fg == "black":
       if m > 4.5: dia = 2
@@ -90,6 +84,7 @@ def drawstars():
     # mp.create_text(x+10, y+1, text=str(m), anchor=W, font=("Helvetica", 8), fill="white")
   if sa.get() == 1: drawdso()
   mp.pack()
+  print 10, 40, rd2xy(10, 40)
 
 def drawdso():
   global fg
@@ -100,6 +95,15 @@ def drawdso():
     dia=6
     mp.create_oval(x-dia/2, y-dia/2, x+dia/2, y+dia/2, outline=fg)
     mp.create_text(x+10, y+1, anchor=W, text=na, font=("Helvetica", 7), fill=fg)
+
+def rd2xy(r, d):
+  # global d1, d2, w, h
+  return (r2x(r), d2y(d))
+  # ra = 2 * pi * (24-r)/24.0
+  # f = (90 - d) / 40.0
+  # x = w/2 + f * sin(ra) * w/2
+  # y = h/2 + f * cos(ra) * h/2
+  # return (x, y)
 
 def r2x(r):
   return (1 - float(rdif(r, r1))/(rdif(r2, r1))) * w
@@ -166,14 +170,14 @@ def raminus():
 
 def deplus():
   global d1, d2
-  if d2 >= 90: return 0
+  if d2 >= 75: return 0
   d1 += 5
   d2 += 5
   drawstars()
 
 def deminus():
   global d1, d2
-  if d1 <= -90: return 0
+  if d1 <= -75: return 0
   d1 -= 5
   d2 -= 5
   drawstars()
@@ -228,8 +232,9 @@ def zoomin():
   drawstars()
 
 def changeview(deg):
-  global r1, r2, d1, d2
+  global r1, r2, d1, d2, pv
   # print "changeview", deg, deg == 360
+  pv = False
   if deg == 25:
     r2 = (r1 + 2) % 24
     d2 = d1 + 25
@@ -244,6 +249,8 @@ def changeview(deg):
     r2 = 24
     d1 = -90
     d2 = 90
+  elif deg == 1:
+    pv = True
   drawstars()
 
 def helptxt():
@@ -281,7 +288,7 @@ def setfg(col):
 
 def main():
   global mp, r1, r2, d1, d2, lcur, cur, lra, lde, viewvar, done
-  global stars, dso, dsofiles, FILES, nm, sa, fg
+  global stars, dso, dsofiles, FILES, nm, sa, fg, pv
   root = Tk()
   root.title("PySkyCoach 0.1")
   stars = {}
@@ -293,6 +300,7 @@ def main():
     dsofiles[pre] = IntVar()
   sa = IntVar()
   fg = "white"
+  pv = False
   readstars()
   readnm()
   dsofiles["easymes"].set(1)
@@ -323,10 +331,11 @@ def main():
   sa.trace_variable("w", callback)
   dm.add_checkbutton(label="Show All", onvalue=1, offvalue=0, variable=sa)
   vm = Menu(mb, tearoff=0)
-  vm.add_command(label="25 deg", command=lambda: changeview(25))
+  # vm.add_command(label="25 deg", command=lambda: changeview(25))
   vm.add_command(label="50 deg", command=lambda: changeview(50))
   vm.add_command(label="100 deg", command=lambda: changeview(100))
   vm.add_command(label="360 deg", command=lambda: changeview(360))
+  # vm.add_command(label="Pole", command=lambda: changeview(1))
   vm.add_command(label="White on Black", command=lambda: setfg("white"))
   vm.add_command(label="Black on White",command=lambda: setfg("black"))
   hm = Menu(mb, tearoff=0)
