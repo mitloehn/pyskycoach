@@ -15,14 +15,14 @@ import random
 from math import sin, cos, pi
 
 # add your own CSV files here!
-FILES = ("easymes.csv", "messier.csv", "urban.csv", "rascngc.csv")
+FILES = ("easymes.csv", "messier.csv", "urban.csv", "rascngc.csv", "southbin.csv")
 
 def clicked(event):
   global cur, mp, score, cnt, done, curi, lcur, fg
   if done: return 0
   (na, r, d) = dso[cur[curi]]
   drawob(na, r, d)
-  (x, y) = rd2xy(r, d)
+  (x, y, chk) = rd2xy(r, d)
   mp.create_line(x, y, event.x, event.y, fill="red")
   score += abs(x-event.x)/float(mp.winfo_width()) + abs(y-event.y)/float(mp.winfo_height()) 
   curi += 1
@@ -33,7 +33,7 @@ def clicked(event):
     lcur.config(text="Find: " + cur[curi])
 
 def getscore():
-  global score, curi, clicks, lcur
+  global score, lcur
   if score < 0.1: msg = "Excellent!"
   elif score < 0.5: msg = "Good."
   elif score < 1.0: msg = "Not too bad."
@@ -43,7 +43,7 @@ def getscore():
 
 def drawob(na, r, d):
   global mp, fg
-  (x, y) = rd2xy(r, d)
+  (x, y, chk) = rd2xy(r, d)
   dia=8
   mp.create_oval(x-dia/2, y-dia/2, x+dia/2, y+dia/2, outline=fg)
   mp.create_text(x+10, y+1, anchor=W, text=na, font=("Helvetica", 8), fill=fg)
@@ -52,21 +52,23 @@ def resize(event):
   drawstars()
 
 def drawstars():
-  global w, h, lra, lde, r1, r2, d1, d2, sa, mp, fg, pv
+  global w, h, lra, lde, r1, r2, d1, d2, sa, mp, fg, pv, pvde
   mp.delete("all")
-  lra.config(text="RA "+str(r1)+" to "+str(r2))
-  lde.config(text="DE "+str(d1)+" to "+str(d2))
+  if pv == 1:
+    lra.config(text="")
+    lde.config(text="DE +"+str(pvde)+" to +90")
+  elif pv == -1:
+    lra.config(text="")
+    lde.config(text="DE -"+str(pvde)+" to -90")
+  else:
+    lra.config(text="RA "+str(r1)+" to "+str(r2))
+    lde.config(text="DE "+str(d1)+" to "+str(d2))
   w = mp.winfo_width()
   h = mp.winfo_height()
   for s in stars.keys():
     (r,d,m) = stars[s]
-    # if pv:
-    #   if d < 50: continue
-    #   (x, y) = rd2xy(r, d)
-    #   print ("%.1f %.1f --> %.1f %.1f" % (r, d, x, y))
-    # else:
-    if (not inr(r)) or d < d1 or d > d2: continue
-    (x, y) = rd2xy(r, d)
+    (x, y, chk) = rd2xy(r, d)
+    if not chk: continue
     # dia = int((7.5-m)*1.0)
     if fg == "black":
       if m > 4.5: dia = 2
@@ -84,26 +86,45 @@ def drawstars():
     # mp.create_text(x+10, y+1, text=str(m), anchor=W, font=("Helvetica", 8), fill="white")
   if sa.get() == 1: drawdso()
   mp.pack()
-  print 10, 40, rd2xy(10, 40)
 
 def drawdso():
-  global fg
+  global fg, pv, pvde
   for k in dso.keys():
     (na, r, d) = dso[k]
-    x = r2x(r)
-    y = d2y(d)
+    (x, y, chk) = rd2xy(r, d)
+    if not chk: continue
     dia=6
     mp.create_oval(x-dia/2, y-dia/2, x+dia/2, y+dia/2, outline=fg)
     mp.create_text(x+10, y+1, anchor=W, text=na, font=("Helvetica", 7), fill=fg)
 
 def rd2xy(r, d):
-  # global d1, d2, w, h
-  return (r2x(r), d2y(d))
+  global pv # d1, d2, w, h
+  if pv != 0:
+    (x, y) = rd2xypv(r, d)
+    chk = x >= 0 and x <= w and y >= 0 and y <= h
+    return (x, y, chk)
+  else:
+    chk = inr(r) and d >= d1 and d <= d2
+    if not chk: return (0, 0, chk)
+    else: return (r2x(r), d2y(d), chk)
   # ra = 2 * pi * (24-r)/24.0
+  # de = 2 * pi * (90-d)/90.0
+  # ll = de
+  # ww =ra
+  # x = (cos(ll) * sin(ww)) / (1 + cos(ll) * cos(ww))
+  # y = (sin(ll)) / (1 + cos(ll) * cos(ww))
   # f = (90 - d) / 40.0
-  # x = w/2 + f * sin(ra) * w/2
-  # y = h/2 + f * cos(ra) * h/2
+  # x = w/2 + f * x * w/2
+  # y = h/2 + f * y * h/2
   # return (x, y)
+
+def rd2xypv(r, d):
+  global pvde, pv
+  rad = abs(90-d*pv)/(90-pvde)
+  phi = 2 * pi * r / 24.0
+  x = w/2 + rad * cos(phi) * w/2
+  y = h/2 + rad * sin(phi) * h/2
+  return (x, y)
 
 def r2x(r):
   return (1 - float(rdif(r, r1))/(rdif(r2, r1))) * w
@@ -169,15 +190,15 @@ def raminus():
   drawstars()
 
 def deplus():
-  global d1, d2
-  if d2 >= 75: return 0
+  global d1, d2, pv
+  if d2 >= 75: return
   d1 += 5
   d2 += 5
   drawstars()
 
 def deminus():
-  global d1, d2
-  if d1 <= -75: return 0
+  global d1, d2, pv
+  if d1 <= -75: return
   d1 -= 5
   d2 -= 5
   drawstars()
@@ -185,7 +206,8 @@ def deminus():
 def bnew():
   global cur, lcur, done, curi, score
   cur = newdso()
-  lcur.config(text="Find: " + cur[0])
+  if len(cur) > 0: lcur.config(text="Find: " + cur[0])
+  else: lcur.config(text="No DSO")
   curi = 0
   score = 0.0
   drawstars()
@@ -196,10 +218,12 @@ def min(x, y):
   else: return y
 
 def newdso():
+  global pv, pvde, w, h
   lst = {}
   for o in dso.keys():
     (na, r, d) = dso[o]
-    if (inr(r) and d >= d1 and d <= d2): lst[na] = 1
+    (x, y, chk) = rd2xy(r, d)
+    if chk: lst[na] = 1
   return random.sample(lst.keys(), min(len(lst), 5))
 
 def reloaddso():
@@ -249,9 +273,9 @@ def changeview(deg):
     r2 = 24
     d1 = -90
     d2 = 90
-  elif deg == 1:
-    pv = True
-  drawstars()
+  elif deg == 1 or deg == -1:
+    pv = deg
+  bnew()
 
 def helptxt():
   showfile("README.md", "PySkyCoach Readme")
@@ -287,8 +311,8 @@ def setfg(col):
   drawstars()
 
 def main():
-  global mp, r1, r2, d1, d2, lcur, cur, lra, lde, viewvar, done
-  global stars, dso, dsofiles, FILES, nm, sa, fg, pv
+  global w, h, mp, r1, r2, d1, d2, lcur, cur, lra, lde, viewvar, done
+  global stars, dso, dsofiles, FILES, nm, sa, fg, pv, pvde
   root = Tk()
   root.title("PySkyCoach 0.1")
   stars = {}
@@ -300,7 +324,8 @@ def main():
     dsofiles[pre] = IntVar()
   sa = IntVar()
   fg = "white"
-  pv = False
+  pv = 0
+  pvde = 50.0
   readstars()
   readnm()
   dsofiles["easymes"].set(1)
@@ -332,10 +357,11 @@ def main():
   dm.add_checkbutton(label="Show All", onvalue=1, offvalue=0, variable=sa)
   vm = Menu(mb, tearoff=0)
   # vm.add_command(label="25 deg", command=lambda: changeview(25))
-  vm.add_command(label="50 deg", command=lambda: changeview(50))
+  # vm.add_command(label="50 deg", command=lambda: changeview(50))
   vm.add_command(label="100 deg", command=lambda: changeview(100))
-  vm.add_command(label="360 deg", command=lambda: changeview(360))
-  # vm.add_command(label="Pole", command=lambda: changeview(1))
+  vm.add_command(label="Whole Sky", command=lambda: changeview(360))
+  vm.add_command(label="N Pole", command=lambda: changeview(1))
+  vm.add_command(label="S Pole", command=lambda: changeview(-1))
   vm.add_command(label="White on Black", command=lambda: setfg("white"))
   vm.add_command(label="Black on White",command=lambda: setfg("black"))
   hm = Menu(mb, tearoff=0)
@@ -347,6 +373,8 @@ def main():
   mb.add_cascade(label="View", menu=vm)
   mb.add_cascade(label="Help", menu=hm)
   root.config(menu=mb)
+  w = mp.winfo_width()
+  h = mp.winfo_height()
   cur = newdso()
   Button(root, text="Start Over", command=bnew).pack(side=RIGHT)
   lcur = Label(root, text="..")
