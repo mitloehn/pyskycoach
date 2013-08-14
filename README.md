@@ -65,16 +65,25 @@ mitloehn@wu.ac.at
 
 TODO:
 
+The current version serves as a basic training program for locating 
+deep sky objects; as such it works as intended. However, many 
+improvements come to mind, and may be implemented sooner or later:
+
 The charted sky section does not change with the size and shape of 
 the window, so depending on the current view a change in window shape 
-will result in less distortion. This is rather unsatisfactory, and 
-should be taken care of automatically.
+will result in more or less distortion. This is rather 
+unsatisfactory, and should be taken care of automatically.
+
+The 'Show All' option should indicate the object type in the display, 
+and the labels should not overlap. This would mean additional file 
+data for object types, and some algorithm for better label 
+positioning.
 
 On a more ambitious scale, different types of quizzes would probably 
 be more motivating, e.g., give the name and type of a displayed 
-object; point out all open clusters in the area; etc. This would
-entail implementing corresponding input methods.
-
+object; point out all open clusters in the area; etc. This would mean 
+a major redesign of the interface, so this is more of a long term 
+goal.
 
 ACKNOWLEDGEMENTS:
 
