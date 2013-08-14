@@ -70,7 +70,7 @@ the window, so depending on the current view a change in window shape
 will result in less distortion. This is rather unsatisfactory, and 
 should be taken care of automatically.
 
-On a more ambitous scale, different types of quizzes would probably 
+On a more ambitious scale, different types of quizzes would probably 
 be more motivating, e.g., give the name and type of a displayed 
 object; point out all open clusters in the area; etc. This would
 entail implementing corresponding input methods.
