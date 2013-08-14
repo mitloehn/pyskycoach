@@ -34,15 +34,14 @@ DSO selected. At the end of the round a score will be shown. The
 score is simply the sum of the errors in the x and y axis relative to 
 the window dimensions.
 
-You can use the RA and DE buttons and the View menu to change the view 
-of the celestial sphere before starting a new round. For views within 
-+/- 75 degrees the right ascension and declination are simply drawn on 
-rectangular x/y coordinates within the window. This method works 
-reasonably well for most parts of the sky but would result in severe 
-distortion towards the celestial poles. Therefore two separate views 
-with azimuthal projection are available for the northern and southern 
-celestial poles via the View menu. Depending on the view a change in 
-window shape will result in less distortion. 
+You can use the RA and DE buttons and the View menu to change the 
+view of the celestial sphere before starting a new round. For views 
+within +/- 75 degrees the right ascension and declination are 
+directly used as cartesian coordinates. This method is simple and 
+fast, and it works reasonably well for most parts of the sky, but it 
+would result in severe distortion towards the celestial poles. 
+Therefore two separate views with azimuthal projection are available 
+for the northern and southern celestial poles via the View menu. 
 
 Use the DSO menu to change the set of deep sky objects: 
 
@@ -63,6 +62,18 @@ Clear Skies!
 
 Johann Mitloehner, Vienna, Austria, July 2013
 mitloehn@wu.ac.at
+
+TODO:
+
+The charted sky section does not change with the size and shape of 
+the window, so depending on the current view a change in window shape 
+will result in less distortion. This is rather unsatisfactory, and 
+should be taken care of automatically.
+
+On a more ambitous scale, different types of quizzes would probably 
+be more motivating, e.g., give the name and type of a displayed 
+object; point out all open clusters in the area; etc. This would
+entail implementing corresponding input methods.
 
 
 ACKNOWLEDGEMENTS:
