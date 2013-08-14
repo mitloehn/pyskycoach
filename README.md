@@ -57,7 +57,6 @@ program and add them in the FILES list at the top of the code. Note
 that Messier objects referenced by NGC numbers will be translated to 
 Messier numbers.
 
-
 Clear Skies!
 
 Johann Mitloehner, Vienna, Austria, July 2013
@@ -65,8 +64,8 @@ mitloehn@wu.ac.at
 
 TODO:
 
-The current version serves as a basic training program for locating 
-deep sky objects; as such it works as intended. However, many 
+The current version serves as a very basic training program for 
+locating deep sky objects; that much works as intended. However, many 
 improvements come to mind, and may be implemented sooner or later:
 
 The charted sky section does not change with the size and shape of 
@@ -87,15 +86,15 @@ goal.
 
 ACKNOWLEDGEMENTS:
 
-This work would not have been possible without the efforts
-of many contributors to amateur astronomy resources and
-professional data made available on the Internet. Many thanks
-go to everyone involved. A good starting point for similar
-resources is http://messier.seds.org/xtra/similar/similar.html
+This work would not have been possible without the efforts of many 
+contributors to amateur astronomy resources and professional data 
+made available on the Internet. Many thanks go to everyone involved. 
+A good starting point for similar resources is 
+http://messier.seds.org/xtra/similar/similar.html
 
 The Astronomical League's Binocular Messier Club
 List A 1 of 42 easy Messier objects,
-as well as the Southern binocular object list
+as well as the Southern binocular objects list
 
 The complete list of Messier objects
 from http://messier.seds.org
@@ -106,6 +105,6 @@ compiled by John Wagoner (stargate at gte.net)
 The Royal Astronomical Society of Canada Finest N.G.C. Objects List 
 compiled by Alan Dyer
 
-BSC5P - Bright Star Catalog, available at
+BSC5P Bright Star Catalog, available at
 http://heasarc.gsfc.nasa.gov/W3Browse/star-catalog/bsc5p.html
 
