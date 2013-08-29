@@ -248,7 +248,6 @@ def reloaddso():
   global dso
   dso = {}
   for k in dsofiles.keys():
-    # print k, dsofiles[k].get()
     if dsofiles[k].get() == 1: readdso(k + ".csv")
 
 def callback(name, index, mode):
@@ -402,9 +401,8 @@ def main():
   sa.trace_variable("w", callback)
   dm.add_checkbutton(label="Show All", onvalue=1, offvalue=0, variable=sa)
   vm = Menu(mb, tearoff=0)
-  # vm.add_command(label="50 deg", command=lambda: changeview(50))
-  vm.add_command(label="100 deg", command=lambda: changeview(100))
-  vm.add_command(label="Whole Sky", command=lambda: changeview(360))
+  vm.add_command(label="100 deg/12 h", command=lambda: changeview(100))
+  vm.add_command(label="360 deg/24 h", command=lambda: changeview(360))
   vm.add_command(label="N Pole", command=lambda: changeview(1))
   vm.add_command(label="S Pole", command=lambda: changeview(-1))
   vm.add_command(label="Orthographic", command=lambda: changeview(-2))
