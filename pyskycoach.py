@@ -15,7 +15,7 @@ import random
 from math import sin, cos, pi
 
 # add your own CSV files here!
-FILES = ("easymes.csv", "messier.csv", "urban.csv", "rascngc.csv", "southbin.csv")
+FILES = ("messier", "rascngc", "urban", "southbin")
 
 def clicked(event):
   global cur, mp, score, cnt, done, curi, lcur, fg
@@ -80,7 +80,7 @@ def drawstars():
       if m > 4.5: dia = 2
       elif m > 3.8: dia = 2
       elif m > 2.8: dia = 3
-      elif m > 1.5: dia = 4
+      elif m > 1.5: dia = 4+1
       else: dia = 7
     mp.create_oval(x, y, x+dia, y+dia, fill=fg, outline=oppcol(fg))
     # mp.create_text(x+10, y+1, text=str(m), anchor=W, font=("Helvetica", 8), fill="white")
@@ -94,37 +94,45 @@ def drawdso():
     (x, y, chk) = rd2xy(r, d)
     if not chk: continue
     dia=6
-    mp.create_oval(x-dia/2, y-dia/2, x+dia/2, y+dia/2, outline=fg)
+    # mp.create_oval(x-dia/2, y-dia/2, x+dia/2, y+dia/2, outline=fg)
+    mp.create_line(x-2, y-2, x+3, y+3, fill=fg)
+    mp.create_line(x-2, y+2, x+3, y-3, fill=fg)
     mp.create_text(x+10, y+1, anchor=W, text=na, font=("Helvetica", 7), fill=fg)
 
 def rd2xy(r, d):
   global pv # d1, d2, w, h
   if pv != 0:
-    (x, y) = rd2xypv(r, d)
-    chk = x >= 0 and x <= w and y >= 0 and y <= h
+    (x, y, chk) = rd2xypv(r, d)
     return (x, y, chk)
   else:
     chk = inr(r) and d >= d1 and d <= d2
     if not chk: return (0, 0, chk)
     else: return (r2x(r), d2y(d), chk)
-  # ra = 2 * pi * (24-r)/24.0
-  # de = 2 * pi * (90-d)/90.0
-  # ll = de
-  # ww =ra
-  # x = (cos(ll) * sin(ww)) / (1 + cos(ll) * cos(ww))
-  # y = (sin(ll)) / (1 + cos(ll) * cos(ww))
-  # f = (90 - d) / 40.0
-  # x = w/2 + f * x * w/2
-  # y = h/2 + f * y * h/2
-  # return (x, y)
 
 def rd2xypv(r, d):
-  global pvde, pv
-  rad = abs(90-d*pv)/(90-pvde)
+  if pv == -2:
+    (lam0, phi0) = (2 * pi * r0/24.0, pi * d0/180.0)
+    (lam, phi) = (2 * pi * r/24.0, pi * d/180.0)
+    x = dpp * (cos(phi) * sin(lam - lam0))
+    y = dpp * (cos(phi0) * sin(phi) - sin(phi0) * cos(phi) * cos(lam - lam0))
+    # if angle != 0.0:
+    #   x = x * cos(angle) - y * sin(angle)
+    #   y = x * sin(angle) + y * cos(angle)
+    x += w/2
+    y += h/2
+    cosc = sin(phi0) * sin(phi) + cos(phi0) * cos(phi) * cos(lam - lam0)
+    chk = cosc >= 0 and x > 0 and x < w and y > 0 and y < h
+  else:
+    (lam, phi) = rd2rad(r, d)
+    x = w/2 * (1 + lam * cos(phi))
+    y = h/2 * (1 + lam * sin(phi))
+    chk = x >= 0 and x <= w and y >= 0 and y <= h
+  return (x, y, chk)
+
+def rd2rad(r, d):
+  rad = abs(90-d*pv)/(90.0-pvde)
   phi = 2 * pi * r / 24.0
-  x = w/2 + rad * cos(phi) * w/2
-  y = h/2 + rad * sin(phi) * h/2
-  return (x, y)
+  return (rad, phi)
 
 def r2x(r):
   return (1 - float(rdif(r, r1))/(rdif(r2, r1))) * w
@@ -178,27 +186,37 @@ def rade(ra,de):
   return (r,d)
 
 def raplus():
-  global r1, r2
+  global r1, r2, r0
   r1 = (r1 + 1) % 24
   r2 = (r2 + 1) % 24
+  r0 = (r0 + 1) % 24
   drawstars()
 
 def raminus():
-  global r1, r2
+  global r1, r2, r0
   r1 = (r1 - 1) % 24
   r2 = (r2 - 1) % 24
+  r0 = (r0 - 1) % 24
   drawstars()
 
 def deplus():
-  global d1, d2, pv
-  if d2 >= 75: return
+  global d1, d2, d0
+  if pv == -2:
+    d0 += 5
+    drawstars()
+    return
+  if d2 >= 90: return
   d1 += 5
   d2 += 5
   drawstars()
 
 def deminus():
-  global d1, d2, pv
-  if d1 <= -75: return
+  global d1, d2, d0
+  if pv == -2:
+    d0 -= 5
+    drawstars()
+    return
+  if d1 <= -90: return
   d1 -= 5
   d2 -= 5
   drawstars()
@@ -223,7 +241,7 @@ def newdso():
   for o in dso.keys():
     (na, r, d) = dso[o]
     (x, y, chk) = rd2xy(r, d)
-    if chk: lst[na] = 1
+    if chk and x > 50 and x < w-50 and y > 50 and y < h-50: lst[na] = 1
   return random.sample(lst.keys(), min(len(lst), 5))
 
 def reloaddso():
@@ -238,16 +256,27 @@ def callback(name, index, mode):
   drawstars()
 
 def zoomout():
-  global r1, r2, d1, d2
-  if rdif(r2, r1) >= 10: return 0
+  global r1, r2, d1, d2, dpp
+  if pv == -2:
+    dpp /= 1.2
+    drawstars()
+    return
+  if rdif(r2, r1) >= 12: return 0
   r1 = (r1 - 1) % 24
   r2 = (r2 + 1) % 24
   d1 -= 10
   d2 += 10
   drawstars()
 
+def zoomoutw(ev):
+  zoomout()
+
 def zoomin():
-  global r1, r2, d1, d2
+  global r1, r2, d1, d2, dpp
+  if pv == -2:
+    dpp *= 1.2
+    drawstars()
+    return
   if rdif(r2, r1) <= 2 or d2-d1 <= 20: return 0
   r1 = (r1 + 1) % 24
   r2 = (r2 - 1) % 24
@@ -255,26 +284,39 @@ def zoomin():
   d2 -= 10
   drawstars()
 
+def zoominw(ev):
+  zoomin()
+
+def rotatp():
+  global angle
+  angle += pi / 16
+  drawstars()
+
+def rotatm():
+  global angle
+  angle -= pi / 16
+  drawstars()
+
 def changeview(deg):
-  global r1, r2, d1, d2, pv
-  # print "changeview", deg, deg == 360
+  global r1, r2, d1, d2, pv, r0, d0, dpp
   pv = False
-  if deg == 25:
-    r2 = (r1 + 2) % 24
-    d2 = d1 + 25
-  elif deg == 50:
+  if deg == 50:
     r2 = (r1 + 4) % 24
     (d1, d2) = (0, 50)
   elif deg == 100:
-    r2 = (r1 + 8) % 24
+    r2 = (r1 + 12) % 24
     (d1, d2) = (-50, 50)
   elif deg == 360:
     r1 = 0
     r2 = 24
     d1 = -90
     d2 = 90
-  elif deg == 1 or deg == -1:
+  elif deg == 1 or deg == -1 or deg == -2:
     pv = deg
+    if deg == -2: # ortho
+      r0 = 19.0
+      d0 = 50.0
+      dpp = 500.0
   bnew()
 
 def helptxt():
@@ -311,8 +353,8 @@ def setfg(col):
   drawstars()
 
 def main():
-  global w, h, mp, r1, r2, d1, d2, lcur, cur, lra, lde, viewvar, done
-  global stars, dso, dsofiles, FILES, nm, sa, fg, pv, pvde
+  global w, h, mp, r1, r2, d1, d2, r0, d0, lcur, cur, lra, lde, viewvar, done
+  global stars, dso, dsofiles, FILES, nm, sa, fg, pv, pvde, angle
   root = Tk()
   root.title("PySkyCoach 0.1")
   stars = {}
@@ -320,21 +362,23 @@ def main():
   nm = {}
   dsofiles = {}
   for f in FILES:
-    (pre,post) = f.split(".")
-    dsofiles[pre] = IntVar()
+    dsofiles[f] = IntVar()
   sa = IntVar()
   fg = "white"
   pv = 0
   pvde = 50.0
+  angle = 0.0
   readstars()
   readnm()
-  dsofiles["easymes"].set(1)
+  dsofiles["messier"].set(1)
   reloaddso()
   done = False
-  r1, r2, d1, d2 = (14, 22, -50, 50)
+  r1, r2, d1, d2, r0, d0 = (10, 22, -50, 50, 19.0, 50.0)
   mp = Canvas(root, width=800, height=600, bg="black")
-  mp.bind("<Button-1>", clicked)
   mp.bind("<Configure>", resize)
+  mp.bind("<Button-1>", clicked)
+  mp.bind("<Button-4>", zoominw)
+  mp.bind("<Button-5>", zoomoutw)
   mp.pack(fill=BOTH, expand=YES)
   lra = Label(root)
   lra.pack(side=LEFT)
@@ -344,24 +388,26 @@ def main():
   Button(root, text="RA-", command=raminus).pack(side=LEFT)
   Button(root, text="DE+", command=deplus).pack(side=LEFT)
   Button(root, text="DE-", command=deminus).pack(side=LEFT)
-  # Button(pan, text="Zoom out", command=zoomout).pack(side=LEFT)
-  # Button(pan, text="Zoom in", command=zoomin).pack(side=LEFT)
+  Button(root, text="IN", command=zoomin).pack(side=LEFT)
+  Button(root, text="OUT", command=zoomout).pack(side=LEFT)
+  #Button(root, text="ROT+", command=rotatp).pack(side=LEFT)
+  #Button(root, text="ROT-", command=rotatm).pack(side=LEFT)
   mb = Menu(root)
   fm = Menu(mb, tearoff=0)
   fm.add_command(label="Quit", command=root.quit)
   dm = Menu(mb, tearoff=0)
-  for k in dsofiles.keys():
-    traceName = dsofiles[k].trace_variable("w", callback)
-    dm.add_checkbutton(label=k, onvalue=1, offvalue=0, variable=dsofiles[k])
+  for f in FILES:
+    traceName = dsofiles[f].trace_variable("w", callback)
+    dm.add_checkbutton(label=f, onvalue=1, offvalue=0, variable=dsofiles[f])
   sa.trace_variable("w", callback)
   dm.add_checkbutton(label="Show All", onvalue=1, offvalue=0, variable=sa)
   vm = Menu(mb, tearoff=0)
-  # vm.add_command(label="25 deg", command=lambda: changeview(25))
   # vm.add_command(label="50 deg", command=lambda: changeview(50))
   vm.add_command(label="100 deg", command=lambda: changeview(100))
   vm.add_command(label="Whole Sky", command=lambda: changeview(360))
   vm.add_command(label="N Pole", command=lambda: changeview(1))
   vm.add_command(label="S Pole", command=lambda: changeview(-1))
+  vm.add_command(label="Orthographic", command=lambda: changeview(-2))
   vm.add_command(label="White on Black", command=lambda: setfg("white"))
   vm.add_command(label="Black on White",command=lambda: setfg("black"))
   hm = Menu(mb, tearoff=0)

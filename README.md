@@ -34,24 +34,27 @@ DSO selected. At the end of the round a score will be shown. The
 score is simply the sum of the errors in the x and y axis relative to 
 the window dimensions.
 
-You can use the RA and DE buttons and the View menu to change the 
-view of the celestial sphere before starting a new round. For views 
-within +/- 75 degrees the right ascension and declination are 
-directly used as cartesian coordinates. This method is simple and 
-fast, and it works reasonably well for most parts of the sky, but it 
-would result in severe distortion towards the celestial poles. 
-Therefore two separate views with azimuthal projection are available 
-for the northern and southern celestial poles via the View menu. 
+You can use the RA and DE buttons and the View menu to change the view 
+of the celestial sphere. There are several methods of projection: 
+
+- In the default method the right ascension and declination are directly 
+  used as cartesian coordinates. This works reasonably well for up to 
+  about +/- 70 degrees declination; it is also used in the view of the
+  whole sky. 
+- Two separate views with azimuthal projection are available for the 
+  northern and southern celestial poles.  
+- The orthographic projection is another option. If you zoom out and set
+  the declination and right ascension corresponding to your observing 
+  location and time you get a 180 degree view.
 
 Use the DSO menu to change the set of deep sky objects: 
 
-- easymes.csv: easy Messier objects
 - messier.csv: complete Messier list
-- urban.csv:   AAAA urban club list 
 - rascngc.csv: RASC's Finest N.G.C.
+- urban.csv:   AAAA urban club list 
 - southbin.csv: AL southern binocular list
 
-The file format is name, right ascension, declination, all separated 
+The file format is name, right ascension, and declination, separated 
 by comas. You can put your own files in the same directory with the 
 program and add them in the FILES list at the top of the code. Note 
 that Messier objects referenced by NGC numbers will be translated to 
