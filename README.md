@@ -1,10 +1,9 @@
 Welcome to the PySkyCoach!
 
-This application shows a view of the sky with the objective of 
-locating deep sky objects with a non-magnifying finder. 
-Several 
-object lists are provided with the package, and additional lists can 
-be prepared using a simple CSV format.
+This application shows a view of the sky and tests your memory of the
+location of deep sky objects. In addition to the Messier catalog
+several other object lists are provided with the package, and 
+additional lists can be prepared in CSV format.
 
 
 INSTALLATION:
@@ -71,6 +70,7 @@ program and add them in the FILES list at the top of the code. Note
 that Messier objects referenced by NGC numbers will be translated to 
 Messier numbers.
 
+
 TODO:
 
 The current version serves as a very basic training program for 
@@ -88,33 +88,34 @@ improvements come to mind, and may be implemented sooner or later:
   a major redesign of the interface, so this is more of a long term 
   goal.
 
+
 ACKNOWLEDGEMENTS:
 
 This work would not have been possible without the efforts of many 
 contributors to amateur astronomy resources and professional data 
 made available on the Internet. Many thanks go to everyone involved!
 
-- The Astronomical League's Binocular Messier Club
-  List A 1 of 42 easy Messier objects,
-  as well as the Southern binocular objects list
-
 - The complete list of Messier objects
   from http://messier.seds.org
-
-- The AAAA Urban Astronomy Club List of Objects
-  compiled by John Wagoner (stargate at gte.net)
 
 - The Royal Astronomical Society of Canada Finest N.G.C. Objects List 
   compiled by Alan Dyer
 
+- The AAAA Urban Astronomy Club List of Objects
+  compiled by John Wagoner (stargate at gte.net)
+
+- The Astronomical League's Southern binocular objects list
+
 - BSC5P Bright Star Catalog, available at
- http://heasarc.gsfc.nasa.gov/W3Browse/star-catalog/bsc5p.html
+  http://heasarc.gsfc.nasa.gov/W3Browse/star-catalog/bsc5p.html
 
 A good starting point for similar resources is 
 http://messier.seds.org/xtra/similar/similar.html
 
+
 Clear Skies!
 
 Johann Mitloehner, Vienna, Austria, August 2013
+
 mitloehn@wu.ac.at
 
