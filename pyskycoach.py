@@ -16,6 +16,7 @@ from math import sin, cos, pi
 
 # add your own CSV files here!
 FILES = ("messier", "rascngc", "urban", "southbin")
+STARFILE = "bscmag5"
 
 def clicked(event):
   global cur, mp, score, cnt, done, curi, lcur, fg
@@ -85,6 +86,7 @@ def drawstars():
     mp.create_oval(x, y, x+dia, y+dia, fill=fg, outline=oppcol(fg))
     # mp.create_text(x+10, y+1, text=str(m), anchor=W, font=("Helvetica", 8), fill="white")
   if sa.get() == 1: drawdso()
+  if grid and pv == 0: drawgrid()
   mp.pack()
 
 def drawdso():
@@ -150,13 +152,32 @@ def inr(r):
   else:
     return r >= r1 or  r <= r2 
 
+def drawgrid():
+  for i in range(r1,r1+24):
+    h = (r1+i) % 24
+    (x1, y1, chk) = rd2xy(h, d1+5)
+    (x2, y2, chk) = rd2xy(h, d2-5)
+    mp.create_line(x1, y1, x2, y2, fill=fg, dash=(1, 5))
+    mp.create_text(x1-4, y1+10, anchor=S, text=str(h)+"h", font=("Helvetica", 8), fill=fg)
+  for d in range(d1,d1+180,10):
+    (x1, y1, chk) = rd2xy(r1+1, d1+d)
+    (x2, y2, chk) = rd2xy(r2-1, d1+d)
+    mp.create_line(x1, y1, x2, y2, fill=fg, dash=(1, 5))
+    mp.create_text(x2-6, y2+0, anchor=E, text=str(d1+d)+"d", font=("Helvetica", 8), fill=fg)
+
 def readstars():
-  f = open("bscmag5.csv", "r")
+  global stars
+  stars = {}
+  f = open(STARFILE+".csv", "r")
   for line in f:
     if line.startswith("#"): continue
-    (hr,na,ra,de,mg) = line.split(",")
-    (r,d) = rade(ra,de)
-    stars[hr] = (r,d,float(mg))
+    try:
+      (hr,na,ra,de,mg) = line.split(",")
+      (r,d) = rade(ra,de)
+      stars[hr] = (r,d,float(mg))
+    except:
+      # entries without visual magnitude, like novae etc
+      continue
   f.close()
 
 def readdso(fn):
@@ -351,9 +372,26 @@ def setfg(col):
   mp.config(bg=oppcol(fg))
   drawstars()
 
+def switchgrid():
+  global grid
+  grid = not grid
+  drawstars()
+
+def bscmag5():
+  global STARFILE
+  STARFILE = "bscmag5"
+  readstars()
+  drawstars()
+
+def bscmag65():
+  global STARFILE
+  STARFILE = "bscmag65"
+  readstars()
+  drawstars()
+
 def main():
   global w, h, mp, r1, r2, d1, d2, r0, d0, lcur, cur, lra, lde, viewvar, done
-  global stars, dso, dsofiles, FILES, nm, sa, fg, pv, pvde, angle
+  global stars, dso, dsofiles, FILES, nm, sa, fg, pv, pvde, angle, grid
   root = Tk()
   root.title("PySkyCoach 0.1")
   stars = {}
@@ -367,6 +405,7 @@ def main():
   pv = 0
   pvde = 50.0
   angle = 0.0
+  grid = False
   readstars()
   readnm()
   dsofiles["messier"].set(1)
@@ -393,6 +432,8 @@ def main():
   #Button(root, text="ROT-", command=rotatm).pack(side=LEFT)
   mb = Menu(root)
   fm = Menu(mb, tearoff=0)
+  fm.add_command(label="BSC to mag 5", command=bscmag5)
+  fm.add_command(label="BSC to mag 6.5", command=bscmag65)
   fm.add_command(label="Quit", command=root.quit)
   dm = Menu(mb, tearoff=0)
   for f in FILES:
@@ -408,6 +449,7 @@ def main():
   vm.add_command(label="Orthographic", command=lambda: changeview(-2))
   vm.add_command(label="White on Black", command=lambda: setfg("white"))
   vm.add_command(label="Black on White",command=lambda: setfg("black"))
+  vm.add_command(label="Grid",command=switchgrid)
   hm = Menu(mb, tearoff=0)
   hm.add_command(label="Instructions", command=helptxt)
   hm.add_command(label="License", command=license)
