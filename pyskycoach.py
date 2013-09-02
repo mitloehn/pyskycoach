@@ -155,15 +155,15 @@ def inr(r):
 def drawgrid():
   for i in range(r1,r1+24):
     h = (r1+i) % 24
-    (x1, y1, chk) = rd2xy(h, d1+5)
-    (x2, y2, chk) = rd2xy(h, d2-5)
+    (x1, y1, chk) = rd2xy(h, d1)
+    (x2, y2, chk) = rd2xy(h, d2)
     mp.create_line(x1, y1, x2, y2, fill=fg, dash=(1, 5))
-    mp.create_text(x1-4, y1+10, anchor=S, text=str(h)+"h", font=("Helvetica", 8), fill=fg)
-  for d in range(d1,d1+180,10):
-    (x1, y1, chk) = rd2xy(r1+1, d1+d)
-    (x2, y2, chk) = rd2xy(r2-1, d1+d)
+    mp.create_text(x1, y1, anchor=S, text=str(h)+"h", font=("Helvetica", 8), fill=fg)
+  for i in range(d1,d2,10):
+    (x1, y1, chk) = rd2xy(r1+0.001, i+0.001)
+    (x2, y2, chk) = rd2xy(r2-0.001, i+0.001)
     mp.create_line(x1, y1, x2, y2, fill=fg, dash=(1, 5))
-    mp.create_text(x2-6, y2+0, anchor=E, text=str(d1+d)+"d", font=("Helvetica", 8), fill=fg)
+    mp.create_text(x2, y2, anchor=W, text=str(i)+"d", font=("Helvetica", 8), fill=fg)
 
 def readstars():
   global stars
@@ -297,7 +297,7 @@ def zoomin():
     dpp *= 1.2
     drawstars()
     return
-  if rdif(r2, r1) <= 2 or d2-d1 <= 20: return 0
+  if rdif(r2, r1) <= 6: return 0
   r1 = (r1 + 1) % 24
   r2 = (r2 - 1) % 24
   d1 += 10
@@ -405,7 +405,7 @@ def main():
   pv = 0
   pvde = 50.0
   angle = 0.0
-  grid = False
+  grid = True
   readstars()
   readnm()
   dsofiles["messier"].set(1)
