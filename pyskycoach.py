@@ -15,12 +15,12 @@ import random
 from math import sin, cos, pi
 
 # add your own CSV files here!
-FILES = ("messier", "rascngc", "urban", "southbin")
+FILES = ("messier", "rascngc", "urban", "southbin", "easymes")
 STARFILE = "bscmag5"
 
 def clicked(event):
   global cur, mp, score, cnt, done, curi, lcur, fg
-  if done: return 0
+  if done: return
   (na, r, d) = dso[cur[curi]]
   drawob(na, r, d)
   (x, y, chk) = rd2xy(r, d)
@@ -61,6 +61,9 @@ def drawstars():
   elif pv == -1:
     lra.config(text="")
     lde.config(text="DE -"+str(pvde)+" to -90")
+  elif pv == -2:
+    lra.config(text="RA "+str(r0))
+    lde.config(text="DE "+str(d0))
   else:
     lra.config(text="RA "+str(r1)+" to "+str(r2))
     lde.config(text="DE "+str(d1)+" to "+str(d2))
@@ -242,7 +245,7 @@ def deminus():
   d2 -= 5
   drawstars()
 
-def bnew():
+def challenge():
   global cur, lcur, done, curi, score
   cur = newdso()
   if len(cur) > 0: lcur.config(text="Find: " + cur[0])
@@ -317,6 +320,21 @@ def rotatm():
   angle -= pi / 16
   drawstars()
 
+def motion(ev):
+  global lastx, lasty, r0, d0, done
+  if not done: return
+  if lastx != -1 and lasty != -1:
+    r0 += 0.01 * (lastx - ev.x)
+    d0 += 0.1 * (lasty - ev.y)
+    drawstars() 
+  lastx, lasty = (ev.x, ev.y)
+
+def release(ev):
+  global lastx, lasty, done
+  if not done: 
+    return
+  lastx, lasty = (-1, -1)
+
 def changeview(deg):
   global r1, r2, d1, d2, pv, r0, d0, dpp
   pv = False
@@ -337,7 +355,7 @@ def changeview(deg):
       r0 = 19.0
       d0 = 50.0
       dpp = 500.0
-  bnew()
+  drawstars()
 
 def helptxt():
   showfile("README.md", "PySkyCoach Readme")
@@ -391,7 +409,8 @@ def bscmag65():
 
 def main():
   global w, h, mp, r1, r2, d1, d2, r0, d0, lcur, cur, lra, lde, viewvar, done
-  global stars, dso, dsofiles, FILES, nm, sa, fg, pv, pvde, angle, grid
+  global stars, dso, dsofiles, FILES, nm, sa, fg, pv, pvde, angle, grid, dpp
+  global lastx, lasty
   root = Tk()
   root.title("PySkyCoach 0.1")
   stars = {}
@@ -402,21 +421,25 @@ def main():
     dsofiles[f] = IntVar()
   sa = IntVar()
   fg = "white"
-  pv = 0
+  pv = -2
+  dpp = 500.0
   pvde = 50.0
   angle = 0.0
-  grid = True
+  grid = False
+  lastx, lasty = (-1, -1)
   readstars()
   readnm()
   dsofiles["messier"].set(1)
   reloaddso()
-  done = False
-  r1, r2, d1, d2, r0, d0 = (10, 22, -50, 50, 19.0, 50.0)
+  done = True
+  r1, r2, d1, d2, r0, d0 = (10, 22, -50, 50, 20.0, 40.0)
   mp = Canvas(root, width=800, height=600, bg="black")
   mp.bind("<Configure>", resize)
   mp.bind("<Button-1>", clicked)
   mp.bind("<Button-4>", zoominw)
   mp.bind("<Button-5>", zoomoutw)
+  mp.bind("<B1-Motion>", motion)
+  mp.bind("<ButtonRelease-1>", release)
   mp.pack(fill=BOTH, expand=YES)
   lra = Label(root)
   lra.pack(side=LEFT)
@@ -440,13 +463,13 @@ def main():
     traceName = dsofiles[f].trace_variable("w", callback)
     dm.add_checkbutton(label=f, onvalue=1, offvalue=0, variable=dsofiles[f])
   sa.trace_variable("w", callback)
-  dm.add_checkbutton(label="Show All", onvalue=1, offvalue=0, variable=sa)
+  dm.add_checkbutton(label="Show DSO", onvalue=1, offvalue=0, variable=sa)
   vm = Menu(mb, tearoff=0)
+  vm.add_command(label="Orthographic", command=lambda: changeview(-2))
   vm.add_command(label="100 deg/12 h", command=lambda: changeview(100))
   vm.add_command(label="360 deg/24 h", command=lambda: changeview(360))
   vm.add_command(label="N Pole", command=lambda: changeview(1))
   vm.add_command(label="S Pole", command=lambda: changeview(-1))
-  vm.add_command(label="Orthographic", command=lambda: changeview(-2))
   vm.add_command(label="White on Black", command=lambda: setfg("white"))
   vm.add_command(label="Black on White",command=lambda: setfg("black"))
   vm.add_command(label="Grid",command=switchgrid)
@@ -462,9 +485,8 @@ def main():
   w = mp.winfo_width()
   h = mp.winfo_height()
   cur = newdso()
-  Button(root, text="Start Over", command=bnew).pack(side=RIGHT)
-  lcur = Label(root, text="..")
-  bnew()
+  Button(root, text="Challenge", command=challenge).pack(side=RIGHT)
+  lcur = Label(root, text="")
   lcur.pack(side=RIGHT)
   root.mainloop()
 

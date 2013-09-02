@@ -26,43 +26,47 @@ USAGE:
 
 In the default mode stars up to visual magnitude 5 are plotted, 
 roughly corresponding to what can be seen with the naked eye from a 
-moderately dark site. 
-Your task is to click on the location of the DSO named in the bottom 
+moderately dark site. You can move the current view by dragging the
+mouse up and down for right ascension, and left and right for declination.
+You can also use the mouse wheel to zoom in and out.
+
+Once you decide on a section of sky you can press the Challenge
+button. Change of view is now disabled, and your task is to click on 
+the location of the DSO named in the bottom 
 bar. The correct location will be shown, with a line displaying the 
 difference from your estimate. The program will present a maximum of 
 5 challenges per round, depending on the region of sky and the set of 
-DSO selected. At the end of the round a score will be shown. The 
+DSO selected. At the end of the round a score will be shown, and
+change of view is once more enabled. The 
 score is simply the sum of the errors in the x and y axis relative to 
 the window dimensions.
 
 Optionally a 6.5 magnitude star catalog can be loaded via the File
-menu for more detailed star charts. This is useful when viewing small 
-regions of sky.
+menu for more detailed star charts. This is useful when viewing 
+very small regions of sky.
 
-You can use the RA and DE buttons and the View menu to change the view 
-of the celestial sphere. There are several methods of projection: 
+There are several methods of projection: 
 
-- In the default method the right ascension and declination are directly 
+- The orthographic projection is the default. If you zoom out and set
+  the declination and right ascension corresponding to your observing 
+  time and location you get a 180 degree view of the whole visible
+  night sky, similar to a planishere.
+- In the 100 deg view the right ascension and declination are directly 
   used as cartesian coordinates. This simple method has the advantage
-  that the grid is rectangular. It works reasonably well for up to 
-  about 70 degrees declination.
+  that the grid is rectangular. Towards the celestial poles the
+  distortion becomes very high.
 - The whole celestial globe can be drawn with this method as well,
-  resulting in very severe distortion close to the poles.
+  resulting in an overview chart resembling a cylinder projection.
 - Two separate views with azimuthal projection are available for the 
   northern and southern celestial poles.  
-- The orthographic projection is another option. In this projection the
-  coordinate grid is not rectangular and cannot easily be drawn with
-  the default Python graphics library. Note that if you zoom out and set
-  the declination and right ascension corresponding to your observing 
-  location and time you get a 180 degree view of the whole visible
-  night sky, similar to a planishere.
 
 Use the DSO menu to change the set of deep sky objects: 
 
-- messier.csv: complete Messier list
-- rascngc.csv: RASC's Finest N.G.C.
-- urban.csv:   AAAA urban club list 
-- southbin.csv: AL southern binocular list
+- messier:  complete Messier list (default)
+- rascngc:  RASC's Finest N.G.C.
+- urban:    AAAA urban club list 
+- southbin: AL southern binocular list
+- easymes:  AL easy binocular Messier objects
 
 The file format is name, right ascension, and declination, separated 
 by comas. You can put your own files in the same directory with the 
@@ -104,7 +108,8 @@ made available on the Internet. Many thanks go to everyone involved!
 - The AAAA Urban Astronomy Club List of Objects
   compiled by John Wagoner (stargate at gte.net)
 
-- The Astronomical League's Southern binocular objects list
+- The Astronomical League's Southern binocular objects list;
+  easy binocular Messier object list
 
 - BSC5P Bright Star Catalog, available at
   http://heasarc.gsfc.nasa.gov/W3Browse/star-catalog/bsc5p.html
