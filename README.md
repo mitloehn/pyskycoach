@@ -62,11 +62,10 @@ There are several methods of projection:
 
 Use the DSO menu to change the set of deep sky objects: 
 
-- messier:  complete Messier list (default)
+- messier:  Messier catalog (default)
 - rascngc:  RASC's Finest N.G.C.
-- urban:    AAAA urban club list 
-- southbin: AL southern binocular list
-- easymes:  AL easy binocular Messier objects
+- urban:    AAAA Urban club list 
+- southbin: Astronomical League's Southern binocular list
 
 The file format is name, right ascension, and declination, separated 
 by comas. You can put your own files in the same directory with the 
@@ -81,16 +80,16 @@ The current version serves as a very basic training program for
 locating deep sky objects; that much works as intended. However, many 
 improvements come to mind, and may be implemented sooner or later:
 
-- The 'Show All' option should indicate the object type in the display, 
+- The 'Show DSO' option should indicate the object type, 
   and the labels should not overlap. This would mean additional file 
   data for object types, and some algorithm for better label 
   positioning.
 
 - On a more ambitious scale, different types of quizzes would probably 
   be more motivating, e.g., give the name and type of a displayed 
-  object; point out all open clusters in the area; etc. This would mean 
-  a major redesign of the interface, so this is more of a long term 
-  goal.
+  object; point out all open clusters in the area; etc. This would 
+  also mean a major redesign of the interface, so this is more of a 
+  long term goal.
 
 
 ACKNOWLEDGEMENTS:
@@ -108,8 +107,7 @@ made available on the Internet. Many thanks go to everyone involved!
 - The AAAA Urban Astronomy Club List of Objects
   compiled by John Wagoner (stargate at gte.net)
 
-- The Astronomical League's Southern binocular objects list;
-  easy binocular Messier object list
+- The Astronomical League's Southern binocular objects list
 
 - BSC5P Bright Star Catalog, available at
   http://heasarc.gsfc.nasa.gov/W3Browse/star-catalog/bsc5p.html

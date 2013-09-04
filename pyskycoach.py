@@ -15,7 +15,7 @@ import random
 from math import sin, cos, pi
 
 # add your own CSV files here!
-FILES = ("messier", "rascngc", "urban", "southbin", "easymes")
+FILES = ("messier", "rascngc", "urban", "southbin")
 STARFILE = "bscmag5"
 
 def clicked(event):
@@ -81,11 +81,19 @@ def drawstars():
       elif m > 1.5: dia = 6
       else: dia = 8
     else:
-      if m > 4.5: dia = 2
-      elif m > 3.8: dia = 2
-      elif m > 2.8: dia = 3
-      elif m > 1.5: dia = 4+1
-      else: dia = 7
+      if STARFILE == "bscmag5":
+        if   m > 4.5: dia = 2
+        elif m > 3.8: dia = 2
+        elif m > 2.8: dia = 3
+        elif m > 1.5: dia = 5
+        else:         dia = 7
+      else:
+        if   m > 5.5: dia = 2
+        elif m > 4.5: dia = 3
+        elif m > 3.8: dia = 4
+        elif m > 2.8: dia = 5
+        elif m > 1.5: dia = 6
+        else:         dia = 8
     mp.create_oval(x, y, x+dia, y+dia, fill=fg, outline=oppcol(fg))
     # mp.create_text(x+10, y+1, text=str(m), anchor=W, font=("Helvetica", 8), fill="white")
   if sa.get() == 1: drawdso()
@@ -95,14 +103,16 @@ def drawstars():
 def drawdso():
   global fg, pv, pvde
   for k in dso.keys():
-    (na, r, d) = dso[k]
+    (na, r, d, ty, vm, sz) = dso[k]
     (x, y, chk) = rd2xy(r, d)
     if not chk: continue
-    dia=6
-    # mp.create_oval(x-dia/2, y-dia/2, x+dia/2, y+dia/2, outline=fg)
+    # dia=16
+    # mp.create_oval(x-dia/2, y-dia/2, x+dia/2, y+dia/2, outline=fg, dash=(2,2))
     mp.create_line(x-2, y-2, x+3, y+3, fill=fg)
     mp.create_line(x-2, y+2, x+3, y-3, fill=fg)
     mp.create_text(x+10, y+1, anchor=W, text=na, font=("Helvetica", 7), fill=fg)
+    if ty != '':
+      mp.create_text(x+10, y+17, anchor=W, text=ty+' '+str(vm)+' '+str(sz)+"'", font=("Helvetica", 7), fill=fg)
 
 def rd2xy(r, d):
   global pv # d1, d2, w, h
@@ -118,8 +128,8 @@ def rd2xypv(r, d):
   if pv == -2:
     (lam0, phi0) = (2 * pi * r0/24.0, pi * d0/180.0)
     (lam, phi) = (2 * pi * r/24.0, pi * d/180.0)
-    x = dpp * (cos(phi) * sin(lam - lam0))
-    y = dpp * (cos(phi0) * sin(phi) - sin(phi0) * cos(phi) * cos(lam - lam0))
+    x = -1 * dpp * (cos(phi) * sin(lam - lam0))
+    y = -1 * dpp * (cos(phi0) * sin(phi) - sin(phi0) * cos(phi) * cos(lam - lam0))
     # if angle != 0.0:
     #   x = x * cos(angle) - y * sin(angle)
     #   y = x * sin(angle) + y * cos(angle)
@@ -187,11 +197,16 @@ def readdso(fn):
   global dso
   f = open(fn, "r")
   for line in f:
-    (na, r, d) = line.split(",")
+    lst = line.split(",")
+    if len(lst) == 3:
+      (na, r, d) = lst
+      (ty, vm, sz) = ('', '0', '0')
+    if len(lst) == 6:
+      (na, r, d, ty, vm, sz) = lst
     (ra, de) = rade(r, d)
     if nm.has_key(na): na = nm[na]
     if na.startswith("NGC "): na = na[4:]
-    dso[na] = (na, ra, de)
+    dso[na] = (na, ra, de, ty, vm, sz)
   f.close()
 
 def readnm():
@@ -263,7 +278,7 @@ def newdso():
   global pv, pvde, w, h
   lst = {}
   for o in dso.keys():
-    (na, r, d) = dso[o]
+    (na, r, d, ty, vm, sz) = dso[o]
     (x, y, chk) = rd2xy(r, d)
     if chk and x > 50 and x < w-50 and y > 50 and y < h-50: lst[na] = 1
   return random.sample(lst.keys(), min(len(lst), 5))
@@ -324,8 +339,8 @@ def motion(ev):
   global lastx, lasty, r0, d0, done
   if not done: return
   if lastx != -1 and lasty != -1:
-    r0 += 0.01 * (lastx - ev.x)
-    d0 += 0.1 * (lasty - ev.y)
+    r0 += -0.01 * (lastx - ev.x)
+    d0 += -0.1 * (lasty - ev.y)
     drawstars() 
   lastx, lasty = (ev.x, ev.y)
 
