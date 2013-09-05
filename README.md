@@ -66,12 +66,15 @@ Use the DSO menu to change the set of deep sky objects:
 - rascngc:  RASC's Finest N.G.C.
 - urban:    AAAA Urban club list 
 - southbin: Astronomical League's Southern binocular list
+- karkoschka: DSO list from Erich Karkoschka's Sky Atlas 
 
 The file format is name, right ascension, and declination, separated 
-by comas. You can put your own files in the same directory with the 
-program and add them in the FILES list at the top of the code. Note 
-that Messier objects referenced by NGC numbers will be translated to 
-Messier numbers.
+by comas. Optionally three more fields can contain type, apparent 
+magnitude, and dimension in arc minutes; these will be displayed
+along with the object name. You can put your own files in the same 
+directory with the program and add them in the FILES list at the top 
+of the code. Note that Messier objects referenced by NGC numbers will 
+be translated to Messier numbers.
 
 
 TODO:
@@ -109,8 +112,12 @@ made available on the Internet. Many thanks go to everyone involved!
 
 - The Astronomical League's Southern binocular objects list
 
+- Erich Karkoschka, The Observer's Sky Atlas; DSO list as published
+  on messier.seds.org, excluding objects not in NGC/IC.
+  
 - BSC5P Bright Star Catalog, available at
   http://heasarc.gsfc.nasa.gov/W3Browse/star-catalog/bsc5p.html
+
 
 A good starting point for similar resources is 
 http://messier.seds.org/xtra/similar/similar.html

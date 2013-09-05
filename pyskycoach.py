@@ -12,10 +12,11 @@
 
 from Tkinter import *
 import random
+import string
 from math import sin, cos, pi
 
 # add your own CSV files here!
-FILES = ("messier", "rascngc", "urban", "southbin")
+FILES = ("messier", "rascngc", "urban", "southbin", "karkoschka")
 STARFILE = "bscmag5"
 
 def clicked(event):
@@ -101,7 +102,7 @@ def drawstars():
   mp.pack()
 
 def drawdso():
-  global fg, pv, pvde
+  global fg, pv, pvde, INFO
   for k in dso.keys():
     (na, r, d, ty, vm, sz) = dso[k]
     (x, y, chk) = rd2xy(r, d)
@@ -111,7 +112,7 @@ def drawdso():
     mp.create_line(x-2, y-2, x+3, y+3, fill=fg)
     mp.create_line(x-2, y+2, x+3, y-3, fill=fg)
     mp.create_text(x+10, y+1, anchor=W, text=na, font=("Helvetica", 7), fill=fg)
-    if ty != '':
+    if ty != '' and INFO.get() == 1:
       mp.create_text(x+10, y+17, anchor=W, text=ty+' '+str(vm)+' '+str(sz)+"'", font=("Helvetica", 7), fill=fg)
 
 def rd2xy(r, d):
@@ -218,6 +219,8 @@ def readnm():
   f.close()
 
 def rade(ra,de):
+  if -1 == string.find(ra, ":"):
+    return (float(ra), float(de))
   (rh,rm) = ra.split(":")
   r = float(rh) + float(rm)/60
   (dh,dm) = de.split(":")
@@ -425,7 +428,7 @@ def bscmag65():
 def main():
   global w, h, mp, r1, r2, d1, d2, r0, d0, lcur, cur, lra, lde, viewvar, done
   global stars, dso, dsofiles, FILES, nm, sa, fg, pv, pvde, angle, grid, dpp
-  global lastx, lasty
+  global lastx, lasty, INFO
   root = Tk()
   root.title("PySkyCoach 0.1")
   stars = {}
@@ -468,6 +471,7 @@ def main():
   Button(root, text="OUT", command=zoomout).pack(side=LEFT)
   #Button(root, text="ROT+", command=rotatp).pack(side=LEFT)
   #Button(root, text="ROT-", command=rotatm).pack(side=LEFT)
+  INFO = IntVar()
   mb = Menu(root)
   fm = Menu(mb, tearoff=0)
   fm.add_command(label="BSC to mag 5", command=bscmag5)
@@ -479,6 +483,8 @@ def main():
     dm.add_checkbutton(label=f, onvalue=1, offvalue=0, variable=dsofiles[f])
   sa.trace_variable("w", callback)
   dm.add_checkbutton(label="Show DSO", onvalue=1, offvalue=0, variable=sa)
+  dm.add_checkbutton(label="more info", onvalue=1, offvalue=0, variable=INFO)
+  INFO.trace_variable("w", callback)
   vm = Menu(mb, tearoff=0)
   vm.add_command(label="Orthographic", command=lambda: changeview(-2))
   vm.add_command(label="100 deg/12 h", command=lambda: changeview(100))
